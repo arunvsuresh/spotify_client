@@ -95,4 +95,9 @@ class SpotifyClient():
         user_track_url = self.spotify_api_base_url + "/me/tracks/"
         headers = self.configure_bearer_auth_header()
         response = requests.get(user_track_url, headers=headers)
-        return response.json()['items'][0]['track']['name']
+        last_saved_track = {}
+        last_saved_track['name'] = response.json()['items'][0]['track']['name']
+        last_saved_track['id'] = response.json()['items'][0]['track']['id']
+        last_saved_track['artist'] = response.json()['items'][0]['track']['artists'][0]['name']
+        return last_saved_track
+

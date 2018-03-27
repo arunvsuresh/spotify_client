@@ -5,6 +5,9 @@ from client_id import creds
 from spotify_client import SpotifyClient
 
 
+class SaveTrackException(Exception):
+    pass
+
 class GoogleOAuth():
     google_auth_url = creds['web']['auth_uri']
     google_token_url = creds['web']['token_uri']
@@ -86,17 +89,38 @@ class GoogleOAuth():
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         return response.json()
 
-    def add_saved_spotify_track_to_sheet(self):
+    def get_last_row_in_spreadsheet(self, id):
+        url = self.google_base_api_url + str(id) + "/values/A2:D"
+        headers = self.configure_bearer_auth_header()
+        response = requests.get(url, headers=headers)
+        return response.json()
+
+    def add_saved_spotify_track_to_sheet(self, id):
         spotify_client = SpotifyClient()
         spotify_client.spotify_access_token = spotify_client.refresh_access_token()
         last_saved_track = spotify_client.get_last_saved_track()
         payload = {
-            "majorDimension": "ROWS",
-            "values": [
-                [last_saved_track]
-            ]
-        }
-        return self.append_row_to_spreadsheet('1u1d9QY_IEzqugWZ41A960vEULOlL9trPkyZz7GiKOaw', payload)
+                "majorDimension": "ROWS",
+                "values": [
+                    [last_saved_track['name'], last_saved_track['artist'], last_saved_track['id']]
+                ]
+            }
+        # if spreadsheet is empty
+        if 'values' not in self.get_last_row_in_spreadsheet(id):
+            return self.append_row_to_spreadsheet(id, payload)
 
+        # if track doesn't already exist in spreadsheet
+        if last_saved_track['id'] != self.get_last_row_in_spreadsheet(id)['values'][0][2]:
 
+            payload = {
+                "majorDimension": "ROWS",
+                "values": [
+                    [last_saved_track['name'], last_saved_track['artist'], last_saved_track['id']]
+                ]
+            }
+            return self.append_row_to_spreadsheet(id, payload)
 
+        # if track already exists
+        else:
+            # raise exception
+            raise SaveTrackException("Track \"{0}\" by \"{1}\" already exists in spreadsheet".format(last_saved_track['name'], last_saved_track['artist']))
