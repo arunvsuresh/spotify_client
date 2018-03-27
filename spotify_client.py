@@ -64,7 +64,7 @@ class SpotifyClient():
         headers = self.configure_basic_auth_header()
 
         response = requests.post(self.spotify_token_url, headers=headers, data=payload)
-        return response.json()
+        return response.json()['access_token']
 
     def get_total_num_of_saved_tracks(self):
         user_track_url = self.spotify_api_base_url + "/me/tracks/"
@@ -90,3 +90,9 @@ class SpotifyClient():
 
         saved_tracks = list(itertools.chain.from_iterable(saved_tracks))
         return saved_tracks
+
+    def get_last_saved_track(self):
+        user_track_url = self.spotify_api_base_url + "/me/tracks/"
+        headers = self.configure_bearer_auth_header()
+        response = requests.get(user_track_url, headers=headers)
+        return response.json()['items'][0]['track']['name']
