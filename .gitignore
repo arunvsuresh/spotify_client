@@ -1,0 +1,4 @@
+*.pyc
+client_id.py
+spotify_secrets.py
+google_sheets_secrets.py

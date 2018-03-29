@@ -3,7 +3,7 @@ import os
 import json
 import base64
 import itertools
-
+from spotify_secrets import creds
 
 class SpotifyClient():
 
@@ -11,11 +11,11 @@ class SpotifyClient():
     spotify_token_url = "https://accounts.spotify.com/api/token"
     spotify_api_base_url = "https://api.spotify.com/v1"
 
-    spotify_code = os.environ['SPOTIFY_CODE']
-    spotify_client_id = os.environ['SPOTIFY_CLIENT_ID']
-    spotify_client_secret = os.environ['SPOTIFY_CLIENT_SECRET']
-    spotify_refresh_token = os.environ['SPOTIFY_REFRESH_TOKEN']
-    spotify_access_token = os.environ['SPOTIFY_ACCESS_TOKEN']
+    spotify_code = creds["spotify_code"]
+    spotify_client_id = creds["spotify_client_id"]
+    spotify_client_secret = creds["spotify_client_secret"]
+    spotify_refresh_token = creds["spotify_refresh_token"]
+    spotify_access_token = creds["spotify_access_token"]
 
     def configure_bearer_auth_header(self):
         headers = {

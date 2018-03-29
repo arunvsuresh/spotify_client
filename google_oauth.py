@@ -2,6 +2,7 @@ import requests
 import os
 import json
 from client_id import creds
+from google_sheets_secrets import google_creds
 from spotify_client import SpotifyClient
 
 
@@ -14,11 +15,10 @@ class GoogleOAuth():
     google_client_id = creds['web']['client_id']
     google_client_secret = creds['web']['client_secret']
     google_redirect_uri = creds['web']['redirect_uris'][0]
-    google_sheets_code = os.environ['GOOGLE_SHEETS_CODE']
-    google_sheets_access_token = os.environ['GOOGLE_SHEETS_ACCESS_TOKEN']
-    google_sheets_refresh_token = os.environ['GOOGLE_SHEETS_REFRESH_TOKEN']
+    google_sheets_code = google_creds["google_sheets_code"]
+    google_sheets_access_token = google_creds["google_sheets_access_token"]
+    google_sheets_refresh_token = google_creds["google_sheets_refresh_token"]
     google_base_api_url = "https://sheets.googleapis.com/v4/spreadsheets/"
-
 
     def configure_bearer_auth_header(self):
         headers = {
@@ -110,7 +110,7 @@ class GoogleOAuth():
             return self.append_row_to_spreadsheet(id, payload)
 
         # if track doesn't already exist in spreadsheet
-        if last_saved_track['id'] != self.get_last_row_in_spreadsheet(id)['values'][0][2]:
+        if last_saved_track['id'] != self.get_last_row_in_spreadsheet(id)['values'][-1][2]:
 
             payload = {
                 "majorDimension": "ROWS",
